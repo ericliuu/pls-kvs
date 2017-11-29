@@ -10,12 +10,10 @@ func main() {
 	fmt.Printf("hello world\n")
 
 	apiThread := api.NewAPIThread()
-	
-	kvsThread := kvs.KVSThread{
-       ApiThreadPtr: &apiThread,
-	}
+
+    kvsThread := kvs.NewKVSThread(&apiThread)
 
 	go apiThread.Exec()
-	
-	kvsThread.Exec()
+
+    kvsThread.Exec()
 }

@@ -29,7 +29,9 @@ func NewAPIThread() APIThread {
 func (api *APIThread) Exec() {
 	fmt.Printf("APITHREAD!!\n")
 
-	setupService()
+    req := common.NewApiRequest(GET, 23, "foo", "bar")
+    api.ApiReqChan <- req
+	//setupService()
 
 }
 

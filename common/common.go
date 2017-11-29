@@ -16,3 +16,13 @@ type ApiResponse struct {
 	Key string
 	Value string
 }
+
+func NewApiRequest(reqType int, id int, key string, value string) ApiRequest {
+    apiReq := ApiRequest {
+        ReqType: reqType,
+        Id: id,
+        Key: key,
+        Value: value,
+    }
+    return apiReq
+}
