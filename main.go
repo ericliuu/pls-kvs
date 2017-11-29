@@ -9,12 +9,10 @@ import (
 func main() {
 	fmt.Printf("hello world\n")
 
-	apiThread := api.APIThread{
-
-	}
+	apiThread := api.NewAPIThread()
 	
 	kvsThread := kvs.KVSThread{
-
+       ApiThreadPtr: &apiThread,
 	}
 
 	go apiThread.Exec()

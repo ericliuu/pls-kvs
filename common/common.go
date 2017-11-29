@@ -3,15 +3,15 @@ package common
 import (
 )
 
-type Request struct {
+type ApiRequest struct {
 	ReqType int
 	Id int
 	Key string
 	Value string
 }
 
-type Return struct {
-	RetType int
+type ApiResponse struct {
+	RespType int
 	Id int
 	Key string
 	Value string

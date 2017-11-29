@@ -3,10 +3,11 @@ package kvs
 import (
 	"fmt"
 	"time"
+	"github.com/ericliuu/pls-kvs/api"
 )
 
 type KVSThread struct {
-
+	ApiThreadPtr *api.APIThread
 }
 
 func (kvs *KVSThread) Exec() {
