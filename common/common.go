@@ -26,3 +26,13 @@ func NewApiRequest(reqType int, id int, key string, value string) ApiRequest {
     }
     return apiReq
 }
+
+func NewApiResponse(resType int, id int, key string, value string) ApiResponse {
+    apiRes := ApiResponse {
+        RespType: resType,
+        Id: id,
+        Key: key,
+        Value: value,
+    }
+    return apiRes
+}
