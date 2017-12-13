@@ -9,48 +9,50 @@ import (
 
 type KVSThread struct {
 	ApiThreadPtr *api.APIThread
-    KVStore map[string]string
+    KVStore *Node
 }
 
+// constructor
 func NewKVSThread(apiThread *api.APIThread) KVSThread {
 	kvsThread := KVSThread{
         ApiThreadPtr: apiThread,
-        KVStore: make(map[string]string),
+        KVStore: NewNode(),
 	}
     return kvsThread
 }
 
 // returns value for a given key
-func (kvs *KVSThread) HandleRequestGet(req common.ApiRequest) {
+func (kvs *KVSThread) handleRequestGet(req common.ApiRequest) {
     response := common.ApiResponse{
         RespType: api.GET,
         Id: 1,
         Key: req.Key,
-        Value: kvs.KVStore[req.Key],
+        Value: kvs.KVStore.getValue(req.Key),
     }
     fmt.Printf("Received: GET (%s, %s)\n", response.Key, response.Value)
     kvs.ApiThreadPtr.ApiResChan <- response
 }
 
 // adds key and value to store
-func (kvs *KVSThread) HandleRequestPut(req common.ApiRequest) {
-    kvs.KVStore[req.Key] = req.Value
+func (kvs *KVSThread) handleRequestPut(req common.ApiRequest) {
+    kvs.KVStore.putValue(req.Key, req.Value)
     fmt.Printf("Received: PUT (%s, %s)\n", req.Key, req.Value)
 }
 
 // deletes a key and value from store
-func (kvs *KVSThread) HandleRequestDelete(req common.ApiRequest) {
-    delete(kvs.KVStore, req.Key)
+func (kvs *KVSThread) handleRequestDelete(req common.ApiRequest) {
+    kvs.KVStore.delValue(req.Key)
 }
+
 // calls method that performs request
-func (kvs *KVSThread) HandleRequest(req common.ApiRequest) {
+func (kvs *KVSThread) handleRequest(req common.ApiRequest) {
     switch req.ReqType {
     case api.GET:
-        kvs.HandleRequestGet(req)
+        kvs.handleRequestGet(req)
     case api.PUT:
-        kvs.HandleRequestPut(req)
+        kvs.handleRequestPut(req)
     case api.DELETE:
-        kvs.HandleRequestDelete(req)
+        kvs.handleRequestDelete(req)
     }
 }
 
@@ -62,7 +64,7 @@ func (kvs *KVSThread) Exec() {
     for {
         //select {
         req := <-kvs.ApiThreadPtr.ApiReqChan
-        kvs.HandleRequest(req)
+        kvs.handleRequest(req)
 
     }
 }
