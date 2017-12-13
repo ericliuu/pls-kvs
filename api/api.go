@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"github.com/ericliuu/pls-kvs/common"
 )
 
@@ -29,17 +30,74 @@ func NewAPIThread() APIThread {
 func (api *APIThread) Exec() {
 	fmt.Printf("APITHREAD!!\n")
 
-    req := common.NewApiRequest(GET, 23, "foo", "bar")
-    api.ApiReqChan <- req
-	//setupService()
+    // Set up web api
+    http.HandleFunc("/", defaultHandler)
+	http.HandleFunc("/key/", api.httpHandler)
 
+	go http.ListenAndServe(":54321", nil)
+
+	for {
+		res := <- api.ApiResChan
+		api.handleResponse(res)
+	}
 }
 
-func setupService() {
-	http.HandleFunc("/", httpHandler)
-	http.ListenAndServe(":54329", nil)
+func (api *APIThread) handleResponse(res common.ApiResponse) {
+	// temporary
+    fmt.Printf("Received RESPONSE (%s, %s)\n", res.Key, res.Value)
 }
 
-func httpHandler(w http.ResponseWriter, r *http.Request) {
+func defaultHandler(w http.ResponseWriter, r *http.Request) {
+	http.Error(w, "Invalid URI", 400)
+}
 
+func (api *APIThread) httpHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		// Serve the resource
+		key := getKeyFromRequest(w, r)
+
+		req := common.NewApiRequest(GET, 1, key, "")
+		api.ApiReqChan <- req		
+
+	case "PUT":
+		// Store new key-value
+		key := getKeyFromRequest(w, r)
+
+		if len(r.Form) > 1 {
+			http.Error(w, "Received too many values", 400)
+		} else if len(r.Form) < 1 {
+			http.Error(w, "No value received", 400)
+		}
+
+		for value := range r.Form {
+			req := common.NewApiRequest(PUT, 1, key, value)
+			api.ApiReqChan <- req
+		}
+
+	case "DELETE":
+		// Delete an existing key-value
+		key := getKeyFromRequest(w, r)
+
+		if len(r.Form) > 1 {
+			http.Error(w, "Received too many values", 400)
+		}
+
+		for value := range r.Form {
+			req := common.NewApiRequest(DELETE, 1, key, value)
+			api.ApiReqChan <- req
+		}
+
+	default:
+		http.Error(w, "Invalid request method", 405)
+	}
+}
+
+func getKeyFromRequest(w http.ResponseWriter, r *http.Request) string {
+	r.ParseForm()
+	key := strings.TrimLeft(r.URL.Path, "/key/")
+	if len(key) == 0 {
+		key = "/"
+	}
+	return key
 }
