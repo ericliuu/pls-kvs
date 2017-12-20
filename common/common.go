@@ -11,11 +11,18 @@ type ApiRequest struct {
 }
 
 type ApiResponse struct {
-	RespType int
+	ReqType int
 	Id int
 	Key string
 	Value string
+    ResCode int
 }
+
+const (
+    FAIL int = -1
+    NOTFOUND int = 0
+    OK int = 1
+)
 
 func NewApiRequest(reqType int, id int, key string, value string) ApiRequest {
     apiReq := ApiRequest {
@@ -27,12 +34,13 @@ func NewApiRequest(reqType int, id int, key string, value string) ApiRequest {
     return apiReq
 }
 
-func NewApiResponse(resType int, id int, key string, value string) ApiResponse {
+func NewApiResponse(resType int, id int, key string, value string, code int) ApiResponse {
     apiRes := ApiResponse {
-        RespType: resType,
+        ReqType: resType,
         Id: id,
         Key: key,
         Value: value,
+        ResCode: code,
     }
     return apiRes
 }

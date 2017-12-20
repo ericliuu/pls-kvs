@@ -22,21 +22,24 @@ func NewKVSThread(apiThread *api.APIThread) KVSThread {
 }
 
 // returns value for a given key
-func (kvs *KVSThread) handleRequestGet(req common.ApiRequest) {
+func (kvs *KVSThread) handleRequestGet(req common.ApiRequest) { 
+
     response := common.ApiResponse{
-        RespType: api.GET,
+        ReqType: api.GET,
         Id: 1,
         Key: req.Key,
         Value: kvs.KVStore.getValue(req.Key),
+        ResCode: common.OK,
     }
-    fmt.Printf("Received: GET (%s, %s)\n", response.Key, response.Value)
+    //fmt.Printf("Received: GET (%s, %s)\n", response.Key, response.Value)
     kvs.ApiThreadPtr.ApiResChan <- response
 }
 
 // adds key and value to store
 func (kvs *KVSThread) handleRequestPut(req common.ApiRequest) {
+
     kvs.KVStore.putValue(req.Key, req.Value)
-    fmt.Printf("Received: PUT (%s, %s)\n", req.Key, req.Value)
+    //fmt.Printf("Received: PUT (%s, %s)\n", req.Key, req.Value)
 }
 
 // deletes a key and value from store
