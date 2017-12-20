@@ -42,11 +42,6 @@ func (api *APIThread) Exec() {
 	}
 }
 
-func (api *APIThread) handleResponse(res common.ApiResponse) {
-	// temporary
-    fmt.Printf("Received RESPONSE (%s, %s)\n", res.Key, res.Value)
-}
-
 func defaultHandler(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Invalid URI", 400)
 }
@@ -64,6 +59,7 @@ func (api *APIThread) httpHandler(w http.ResponseWriter, r *http.Request) {
 		// Store new key-value
 		key := getKeyFromRequest(w, r)
 
+		// note: error catching doesn't happen
 		if len(r.Form) > 1 {
 			http.Error(w, "Received too many values", 400)
 		} else if len(r.Form) < 1 {
@@ -79,14 +75,13 @@ func (api *APIThread) httpHandler(w http.ResponseWriter, r *http.Request) {
 		// Delete an existing key-value
 		key := getKeyFromRequest(w, r)
 
-		if len(r.Form) > 1 {
-			http.Error(w, "Received too many values", 400)
+		// note: error catching doesn't happen
+		if len(r.Form) > 0 {
+			http.Error(w, "No value should be specified", 400)
 		}
 
-		for value := range r.Form {
-			req := common.NewApiRequest(DELETE, 1, key, value)
-			api.ApiReqChan <- req
-		}
+		req := common.NewApiRequest(DELETE, 1, key, "")
+		api.ApiReqChan <- req
 
 	default:
 		http.Error(w, "Invalid request method", 405)

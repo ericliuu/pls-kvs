@@ -3,6 +3,12 @@ package common
 import (
 )
 
+const (
+    FAIL int = -1
+    NOTFOUND int = 0
+    OK int = 1
+)
+
 type ApiRequest struct {
 	ReqType int
 	Id int
@@ -17,12 +23,6 @@ type ApiResponse struct {
 	Value string
     ResCode int
 }
-
-const (
-    FAIL int = -1
-    NOTFOUND int = 0
-    OK int = 1
-)
 
 func NewApiRequest(reqType int, id int, key string, value string) ApiRequest {
     apiReq := ApiRequest {
