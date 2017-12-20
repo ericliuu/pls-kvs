@@ -8,6 +8,7 @@ type Node struct {
     Value string
 }
 
+// constructor
 func NewNode() *Node {
     node := &Node{
         Dir: make(map[string]*Node),
@@ -17,9 +18,22 @@ func NewNode() *Node {
     return node
 }
 
+// determines whether key exists in KVStore
+func (node *Node) inStore(key string) bool {
+    // assigns _ to Dir[key] or the empty value, OK gets a boolean
+    // if statement evaluates OK
+    if _, ok := node.Dir[key]; ok {
+        return true
+    }
+    return false
+}
+
 // returns value at key
 func (node *Node) getValue(key string) string {
-    return node.Dir[key].Value
+    if node.inStore(key) {
+        return node.Dir[key].Value
+    }
+    return ""
 }
 
 // deletes value at key
