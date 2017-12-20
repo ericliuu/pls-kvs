@@ -56,7 +56,7 @@ func (kvs *KVSThread) handleRequestDelete(req common.ApiRequest) {
     }
 
     response := common.ApiResponse {
-        ReqType: api.GET,
+        ReqType: api.DELETE,
         Id: 1,
         Key: req.Key,
         Value: kvs.KVStore.getValue(req.Key),

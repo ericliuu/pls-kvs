@@ -14,7 +14,7 @@ func (api *APIThread) handleResponse(res common.ApiResponse) {
    	case DELETE:
    		displayDeleteResponse(res)
 	default:
-		fmt.Printf("Invalid request method received from key-value store")
+		fmt.Printf("Invalid request method received from key-value store\n")
    	}
 }
 
@@ -27,7 +27,7 @@ func displayGetResponse(res common.ApiResponse) {
 	case common.FAIL:
 		fmt.Printf("Get operation failed for key: %s\n", res.Key)
 	default:
-		fmt.Printf("Error occured when handling request")
+		fmt.Printf("Error occured when handling request\n")
 	}
 }
 
@@ -39,7 +39,7 @@ func displayPutResponse(res common.ApiResponse) {
 	case common.FAIL:
 		fmt.Printf("Put operation failed for pair: (%s, %s)\n", res.Key, res.Value)
 	default:
-		fmt.Printf("Error occured when handling request")
+		fmt.Printf("Error occured when handling request\n")
 	}
 }
 
@@ -48,10 +48,10 @@ func displayDeleteResponse(res common.ApiResponse) {
 	case common.OK:
 		fmt.Printf("Deleted pair: (%s, %s)\n", res.Key, res.Value)
 	case common.NOTFOUND:
-		fmt.Printf("Pair not found: (%s, %s)", res.Key, res.Value)
+		fmt.Printf("Pair not found: (%s, %s)\n", res.Key, res.Value)
 	case common.FAIL:
 		fmt.Printf("Delete operation failed for pair: (%s, %s)\n", res.Key, res.Value)
 	default:
-		fmt.Printf("Error occured when handling request")
+		fmt.Printf("Error occured when handling request\n")
 	}
 }
