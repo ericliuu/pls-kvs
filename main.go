@@ -7,13 +7,13 @@ import (
 )
 
 func main() {
-	fmt.Printf("hello world\n")
+	fmt.Printf("Initiated key value store!\n")
 
 	apiThread := api.NewAPIThread()
 
-    kvsThread := kvs.NewKVSThread(&apiThread)
+	kvsThread := kvs.NewKVSThread(&apiThread)
 
 	go apiThread.Exec()
 
-    kvsThread.Exec()
+	kvsThread.Exec()
 }

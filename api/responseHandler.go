@@ -23,7 +23,7 @@ func displayGetResponse(res common.ApiResponse) {
 	case common.OK:
 		fmt.Printf("Found pair: (%s, %s)\n", res.Key, res.Value)
 	case common.NOTFOUND:
-		fmt.Printf("No value found for key: $s\n", res.Key)
+		fmt.Printf("No value found for key: %s\n", res.Key)
 	case common.FAIL:
 		fmt.Printf("Get operation failed for key: %s\n", res.Key)
 	default:

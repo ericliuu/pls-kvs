@@ -81,7 +81,7 @@ func (kvs *KVSThread) handleRequest(req common.ApiRequest) {
 }
 
 func (kvs *KVSThread) Exec() {
-	fmt.Printf("KVSTHREAD!!\n")
+	fmt.Printf("KVS thread started...\n")
 
 	time.Sleep(100 * time.Millisecond)
 

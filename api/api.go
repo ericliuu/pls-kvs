@@ -19,6 +19,7 @@ type APIThread struct {
 }
 
 func NewAPIThread() APIThread {
+	// Create the request and response channels to communicate with the KVS thread
 	apiThread := APIThread {
 		ApiReqChan: make(chan common.ApiRequest, 10),
 		ApiResChan: make(chan common.ApiResponse, 10),
@@ -28,17 +29,19 @@ func NewAPIThread() APIThread {
 
 
 func (api *APIThread) Exec() {
-	fmt.Printf("APITHREAD!!\n")
+	fmt.Printf("API thread started...\n")
 
-    // Set up web api
-    http.HandleFunc("/", defaultHandler)
+	// Set up web server
+	http.HandleFunc("/", defaultHandler)
 	http.HandleFunc("/key/", api.httpHandler)
 
 	go http.ListenAndServe(":54321", nil)
 
 	for {
-		res := <- api.ApiResChan
-		api.handleResponse(res)
+		select {
+			case res := <- api.ApiResChan:
+				api.handleResponse(res)
+		}
 	}
 }
 
@@ -49,24 +52,25 @@ func defaultHandler(w http.ResponseWriter, r *http.Request) {
 func (api *APIThread) httpHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		// Serve the resource
+		// Retrieve the corresponding value for the key
 		key := getKeyFromRequest(w, r)
 
 		req := common.NewApiRequest(GET, 1, key, "")
-		api.ApiReqChan <- req		
+		api.ApiReqChan <- req
 
 	case "PUT":
 		// Store new key-value
 		key := getKeyFromRequest(w, r)
 
-		// note: error catching doesn't happen
-		if len(r.Form) > 1 {
-			http.Error(w, "Received too many values", 400)
-		} else if len(r.Form) < 1 {
-			http.Error(w, "No value received", 400)
-		}
+		numValues := 0
 
 		for value := range r.Form {
+			numValues++
+			if numValues > 1 {
+				http.Error(w, "Received too many values", 400)
+				break
+			}
+
 			req := common.NewApiRequest(PUT, 1, key, value)
 			api.ApiReqChan <- req
 		}
@@ -74,11 +78,6 @@ func (api *APIThread) httpHandler(w http.ResponseWriter, r *http.Request) {
 	case "DELETE":
 		// Delete an existing key-value
 		key := getKeyFromRequest(w, r)
-
-		// note: error catching doesn't happen
-		if len(r.Form) > 0 {
-			http.Error(w, "No value should be specified", 400)
-		}
 
 		req := common.NewApiRequest(DELETE, 1, key, "")
 		api.ApiReqChan <- req
@@ -89,7 +88,12 @@ func (api *APIThread) httpHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getKeyFromRequest(w http.ResponseWriter, r *http.Request) string {
-	r.ParseForm()
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Error parsing request", 400)
+	}
+	
+	// Retreive the key string from the URI	
 	key := strings.TrimLeft(r.URL.Path, "/key/")
 	if len(key) == 0 {
 		key = "/"
